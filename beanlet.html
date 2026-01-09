@@ -99,12 +99,6 @@
     <button class="sideBtn" onclick="showPanel('stats')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Stats</button>
     <button class="sideBtn" onclick="showPanel('clicker')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Clicker</button>
 
-    <div style="margin-top:auto;color:#ddd;">
-      <div style="font-size:12px;color:#aaa;">Tokens</div>
-      <div id="tokenCount" style="font-size:20px;font-weight:700;color:gold;">0</div>
-    </div>
-  </div>
-
   <div style="flex:1;display:flex;justify-content:center;align-items:flex-start;padding:30px;">
     <div style="width:800px;">
 
@@ -279,15 +273,20 @@ function showPanel(name){
   if(btn) btn.style.background='#4368a8';
 }
 
+// Market data: Bean Pack with rarities and weighted rates (rates sum to 100)
 const PACKS = [
   {
-    id: 'starter',
-    title: 'Starter Pack',
-    cost: 5,d
-    image: 'https://via.placeholder.com/300x120?text=Starter+Pack',
+    id: 'beanpack',
+    title: 'Bean Pack',
+    cost: 5,
+    image: 'https://via.placeholder.com/300x120?text=Bean+Pack',
     contents: [
-      { name: 'Bean A', image: 'https://via.placeholder.com/120?text=Bean+A' },
-      { name: 'Bean B', image: 'https://via.placeholder.com/120?text=Bean+B' }
+      { name: 'Default Bean', image: 'https://via.placeholder.com/120?text=Default+Bean', rarity: 'Uncommon', rate: 45 },
+      { name: 'Scary Bean', image: 'https://via.placeholder.com/120?text=Scary+Bean', rarity: 'Rare', rate: 25 },
+      { name: 'Orange Bean', image: 'https://via.placeholder.com/120?text=Orange+Bean', rarity: 'Epic', rate: 15 },
+      { name: 'Epic Bean', image: 'https://via.placeholder.com/120?text=Epic+Bean', rarity: 'Legendary', rate: 8 },
+      { name: 'Interview Bean', image: 'https://via.placeholder.com/120?text=Interview+Bean', rarity: 'Chroma', rate: 5 },
+      { name: 'Bean Troll', image: 'https://via.placeholder.com/120?text=Bean+Troll', rarity: 'Mythical', rate: 2 }
     ]
   }
 ];
@@ -329,19 +328,30 @@ function renderInventory(){
   });
 }
 
+function pickFromPack(contents){
+  const total = contents.reduce((s,it)=>s + (it.rate||0), 0);
+  let r = Math.random() * total;
+  for(const it of contents){
+    const w = it.rate || 0;
+    if(r < w) return it;
+    r -= w;
+  }
+  return contents[contents.length-1];
+}
+
 function buyPack(packId){
   if(!currentUser) return alert('Log in first');
   const p = PACKS.find(x=>x.id===packId);
   if(!p) return alert('Pack not found');
   if(userData.tokens < p.cost) return alert('Not enough tokens');
   userData.tokens -= p.cost;
-  // give one random item from pack
-  const choice = p.contents[Math.floor(Math.random()*p.contents.length)];
-  const newItem = { id: 'b'+Date.now()+Math.random().toString(36).slice(2,6), name: choice.name, image: choice.image };
+  // weighted random choice based on rate
+  const choice = pickFromPack(p.contents);
+  const newItem = { id: 'b'+Date.now()+Math.random().toString(36).slice(2,6), name: choice.name, image: choice.image, rarity: choice.rarity };
   userData.inventory.push(newItem);
   saveUserData();
   updateUI();
-  alert('You got: ' + choice.name);
+  alert('You got: ' + choice.name + ' (' + (choice.rarity||'') + ')');
 }
 
 // initialize UI state
