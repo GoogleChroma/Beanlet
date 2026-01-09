@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Beanlet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&family=Nunito:wght@800&display=swap" rel="stylesheet">
+</head>
+
+<body style="margin:0;background:#4670a4;color:#1e1e1e;font-family:Arial,sans-serif;overflow:hidden;">
+
+<!-- HOME -->
+<div id="home" style="height:100vh;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 40px;">
+    <div style="font-family:'Titan One';font-size:64px;">Beanlet</div>
+    <div>
+  <button onclick="showAuth()"
+        style="margin-right:30px;padding:30px 50px;border:none;border-radius:12px;background:#87c8e8;color:white;cursor:pointer;">
+  <div style="font-family:'Nunito';font-size:20px;line-height:1.05\;">
+       Login
+      </button>
+      <button onclick="showAuth()"
+        style="margin-right:30px;padding:30px 50px;border:none;border-radius:12px;background:#87c8e8;color:white;cursor:pointer;">
+  <div style="font-family:'Nunito';font-size:20px;line-height:1.05;">
+       Register
+      </button>
+    </div>
+  </div>
+
+  <div style="display:flex;height:calc(100vh - 100px);">
+    <div style="flex:1;display:flex;align-items:center;padding-left:60px;">
+      <div style="font-family:'Nunito';font-size:60px;line-height:1.05;">
+        First<br>Bean<br>Server
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;justify-content:center;align-items:center;">
+      <div style="display:grid;grid-template-columns:repeat(4,90px);gap:40px;transform:rotate(-10deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-20deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(7deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-5deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(13deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(22deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-8deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(2deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-2deg);">
+                <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-12deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(8deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-5deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(15deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-12deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(8deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(-5deg);">
+        <img src="https://blogs.ubc.ca/etec522/files/2023/06/image-1-300x275.png" style="width:80px;border-radius:16px;transform:rotate(15deg);">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="auth" style="display:none;height:100vh;justify-content:center;align-items:center;">
+  <div style="background:#1e1e1e;padding:30px;border-radius:12px;width:300px;text-align:center;border:3px solid gold;">
+
+    <div style="font-family:'Titan One';font-size:28px;color:#ffd700;margin-bottom:20px;">Beanlet</div>
+
+    <input id="user" placeholder="Username"
+      style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;">
+
+    <input id="pass" type="password" placeholder="Password"
+      style="width:100%;padding:10px;margin-bottom:15px;border-radius:6px;border:none;">
+
+    <button onclick="registerUser()"
+      style="width:100%;padding:12px;margin-bottom:10px;font-family:'Nunito';
+      background:#6a86d1;border:none;border-radius:8px;cursor:pointer;">
+      Register
+    </button>
+
+    <button onclick="loginUser()"
+      style="width:100%;padding:12px;font-family:'Nunito';
+      background:#86b5f3;border:none;border-radius:8px;cursor:pointer;">
+      Login
+    </button>
+
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" style="display:none;height:100vh;display:flex;">
+
+  <div id="sidebar" style="width:220px;background:#1c1c1c;padding:20px;display:flex;flex-direction:column;gap:12px;">
+    <div style="font-family:'Titan One';font-size:40px;margin-bottom:8px;color:gold;">Beanlet</div>
+    <button class="sideBtn" onclick="showPanel('beans')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Beans</button>
+    <button class="sideBtn" onclick="showPanel('market')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Market</button>
+    <button class="sideBtn" onclick="showPanel('stats')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Stats</button>
+    <button class="sideBtn" onclick="showPanel('clicker')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Clicker</button>
+
+    <div style="margin-top:auto;color:#ddd;">
+      <div style="font-size:12px;color:#aaa;">Tokens</div>
+      <div id="tokenCount" style="font-size:20px;font-weight:700;color:gold;">0</div>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;justify-content:center;align-items:flex-start;padding:30px;">
+    <div style="width:800px;">
+
+      <!-- Clicker panel -->
+      <div id="panel-clicker" class="panel" style="display:none;text-align:center;">
+        <div style="font-family:'Titan One';font-size:36px;color:gold;">Beanlet</div>
+        <img id="clickImg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThQsydm_zzUbWbSadUVj6oc-x4iHzPa6RlnQ&s"
+          style="width:200px;cursor:pointer;margin-top:20px;" onclick="doClick()">
+        <div id="clickCount" style="font-size:24px;margin-top:15px;">Clicks: 0</div>
+      </div>
+
+      <!-- Beans / Inventory panel -->
+      <div id="panel-beans" class="panel" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-family:'Titan One';font-size:28px;color:gold;">Beans</div>
+          <div style="color:#aaa;">Inventory</div>
+        </div>
+        <div id="inventoryGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;"></div>
+      </div>
+
+      <!-- Market panel -->
+      <div id="panel-market" class="panel" style="display:none;">
+        <div style="font-family:'Titan One';font-size:28px;color:gold;">Market</div>
+        <div id="marketList" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;"></div>
+      </div>
+
+      <!-- Stats panel -->
+      <div id="panel-stats" class="panel" style="display:none;">
+        <div style="font-family:'Titan One';font-size:28px;color:gold;">Stats</div>
+        <div style="margin-top:12px;color:#ddd;">
+          <div id="statClicks">Clicks: 0</div>
+          <div id="statTokens">Tokens: 0</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbw0iogFAY42_L8VO-tZuSGB5UacKDJGygL8dGr0BVK0nYX4djyzhURN-uEehLd23V1E/exec";
+
+const home = document.getElementById("home");
+const auth = document.getElementById("auth");
+const game = document.getElementById("game");
+const user = document.getElementById("user");
+const pass = document.getElementById("pass");
+const clickCount = document.getElementById("clickCount");
+const tokenCountEl = document.getElementById("tokenCount");
+const inventoryGrid = document.getElementById("inventoryGrid");
+const marketList = document.getElementById("marketList");
+const statClicks = document.getElementById("statClicks");
+const statTokens = document.getElementById("statTokens");
+
+let currentUser = null;
+let userData = { tokens: 0, inventory: [], clicks: 0 };
+
+[user, pass].forEach(i => {
+  i.addEventListener("keydown", e => {
+    if (e.key === "Enter") e.preventDefault();
+  });
+});
+
+function showAuth(){
+  home.style.display = "none";
+  auth.style.display = "flex";
+}
+
+function userKey(name){ return `beanlet_data_${name}`; }
+
+function saveUserData(){
+  if(!currentUser) return;
+  localStorage.setItem(userKey(currentUser), JSON.stringify(userData));
+}
+
+function loadUserData(){
+  if(!currentUser) return;
+  const raw = localStorage.getItem(userKey(currentUser));
+  if(raw) userData = JSON.parse(raw);
+  // ensure fields
+  userData.tokens = Number(userData.tokens||0);
+  userData.inventory = userData.inventory || [];
+  userData.clicks = Number(userData.clicks||0);
+  updateUI();
+}
+
+async function callApi(payload){
+  try{
+    const res = await fetch(API,{ method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(payload) });
+    if(!res.ok) throw new Error('Network response was not ok: ' + res.status);
+    const text = await res.text();
+    try{ return JSON.parse(text); }catch(err){ console.error('Invalid JSON from API', text); throw new Error('Invalid JSON response from API'); }
+  }catch(err){ console.error('API call failed', err); throw err; }
+}
+
+async function registerUser(){
+  if(!user.value || !pass.value) return alert("Fill all fields");
+  try{
+    const d = await callApi({ action: "register", username: user.value.trim(), password: pass.value });
+    if(!d || !d.success) return alert(d && d.message ? d.message : 'User already exists');
+    // create local profile
+    currentUser = user.value.trim();
+    userData = { tokens: 0, inventory: [], clicks: 0 };
+    saveUserData();
+    alert('Registered successfully');
+    auth.style.display = "none";
+    game.style.display = "flex";
+    showPanel('clicker');
+  }catch(err){ alert('Registration failed: ' + (err.message || err)); }
+}
+
+async function loginUser(){
+  if(!user.value || !pass.value) return alert("Fill all fields");
+  try{
+    const d = await callApi({ action: "login", username: user.value.trim(), password: pass.value });
+    if(!d || !d.success) return alert(d && d.message ? d.message : 'Invalid login');
+    currentUser = user.value.trim();
+    // load local data (or create if missing)
+    loadUserData();
+    // prefer server clicks if available
+    if(d.clicks) userData.clicks = Number(d.clicks||0);
+    saveUserData();
+    clickCount.innerText = "Clicks: " + (userData.clicks || 0);
+    auth.style.display = "none";
+    game.style.display = "flex";
+    renderMarket();
+    renderInventory();
+    showPanel('clicker');
+  }catch(err){ alert('Login failed: ' + (err.message || err)); }
+}
+
+async function doClick(){
+  if(!currentUser) return alert('Not logged in');
+  try{
+    // call server to increment clicks (sheet)
+    const d = await callApi({ action: "click", username: currentUser });
+    if(d && d.success){
+      userData.clicks = Number(userData.clicks||0) + 1;
+      userData.tokens = Number(userData.tokens||0) + 1; // grant 1 token per click
+      saveUserData();
+      updateUI();
+    }else{
+      console.warn('Click not recorded', d);
+    }
+  }catch(err){
+    // even if API fails, still grant locally to keep experience fluid
+    console.warn('Click API failed, awarding locally', err);
+    userData.clicks = Number(userData.clicks||0) + 1;
+    userData.tokens = Number(userData.tokens||0) + 1;
+    saveUserData();
+    updateUI();
+  }
+}
+
+function updateUI(){
+  clickCount.innerText = "Clicks: " + (userData.clicks || 0);
+  tokenCountEl.innerText = userData.tokens || 0;
+  statClicks.innerText = "Clicks: " + (userData.clicks || 0);
+  statTokens.innerText = "Tokens: " + (userData.tokens || 0);
+  renderInventory();
+}
+
+function showPanel(name){
+  const panels = ['clicker','beans','market','stats'];
+  panels.forEach(p => {
+    const el = document.getElementById('panel-' + p);
+    if(el) el.style.display = (p === name) ? 'block' : 'none';
+  });
+  // highlight active button
+  document.querySelectorAll('#sidebar .sideBtn').forEach(b=>b.style.background='#2a2a2a');
+  const btn = Array.from(document.querySelectorAll('#sidebar .sideBtn')).find(b=>b.textContent.toLowerCase()===name);
+  if(btn) btn.style.background='#4368a8';
+}
+
+// Market data: placeholder pack
+const PACKS = [
+  {
+    id: 'starter',
+    title: 'Starter Pack',
+    cost: 5,
+    image: 'https://via.placeholder.com/300x120?text=Starter+Pack',
+    contents: [
+      { name: 'Bean A', image: 'https://via.placeholder.com/120?text=Bean+A' },
+      { name: 'Bean B', image: 'https://via.placeholder.com/120?text=Bean+B' }
+    ]
+  }
+];
+
+function renderMarket(){
+  marketList.innerHTML = '';
+  PACKS.forEach(p=>{
+    const card = document.createElement('div');
+    card.style.background = '#222';
+    card.style.padding = '12px';
+    card.style.borderRadius = '8px';
+    card.innerHTML = `
+      <div style="font-weight:700;color:gold;">${p.title}</div>
+      <img src="${p.image}" style="width:100%;border-radius:6px;margin-top:8px;">
+      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="color:#ddd">Cost: ${p.cost} tokens</div>
+        <button style="padding:8px;border-radius:6px;border:none;background:#6a86d1;color:white;cursor:pointer;" onclick="buyPack('${p.id}')">Buy</button>
+      </div>
+    `;
+    marketList.appendChild(card);
+  });
+}
+
+function renderInventory(){
+  inventoryGrid.innerHTML = '';
+  userData.inventory = userData.inventory || [];
+  if(userData.inventory.length===0){
+    inventoryGrid.innerHTML = '<div style="color:#aaa;grid-column:1/-1;text-align:center;padding:20px;">No beans yet. Buy packs in the market.</div>';
+    return;
+  }
+  userData.inventory.forEach(item=>{
+    const c = document.createElement('div');
+    c.style.background = '#222';
+    c.style.padding = '8px';
+    c.style.borderRadius = '8px';
+    c.style.textAlign = 'center';
+    c.innerHTML = `<img src="${item.image}" style="width:100%;border-radius:6px;"><div style="color:#fff;margin-top:8px">${item.name}</div>`;
+    inventoryGrid.appendChild(c);
+  });
+}
+
+function buyPack(packId){
+  if(!currentUser) return alert('Log in first');
+  const p = PACKS.find(x=>x.id===packId);
+  if(!p) return alert('Pack not found');
+  if(userData.tokens < p.cost) return alert('Not enough tokens');
+  userData.tokens -= p.cost;
+  // give one random item from pack
+  const choice = p.contents[Math.floor(Math.random()*p.contents.length)];
+  const newItem = { id: 'b'+Date.now()+Math.random().toString(36).slice(2,6), name: choice.name, image: choice.image };
+  userData.inventory.push(newItem);
+  saveUserData();
+  updateUI();
+  alert('You got: ' + choice.name);
+}
+
+// initialize UI state
+renderMarket();
+showPanel('clicker');
+</script>
+
+</body>
+</html>
