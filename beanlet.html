@@ -92,31 +92,24 @@
 <!-- GAME -->
 <div id="game" style="display:none;height:100vh;display:flex;">
 
-  <div id="sidebar" style="width:220px;background:#1c1c1c;padding:20px;display:flex;flex-direction:column;gap:12px;">
+  <div id="sidebar" style="width:220px;background:#6c6cb9;padding:20px;display:flex;flex-direction:column;gap:12px;">
     <div style="font-family:'Titan One';font-size:40px;margin-bottom:8px;color:gold;">Beanlet</div>
-    <button class="sideBtn" onclick="showPanel('beans')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Beans</button>
-    <button class="sideBtn" onclick="showPanel('market')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Market</button>
-    <button class="sideBtn" onclick="showPanel('stats')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Stats</button>
-    <button class="sideBtn" onclick="showPanel('clicker')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#2a2a2a;color:white;">Clicker</button>
-
-    <div style="margin-top:auto;color:#ddd;">
-      <div style="font-size:12px;color:#aaa;">Tokens</div>
-      <div id="tokenCount" style="font-size:20px;font-weight:700;color:gold;">0</div>
-    </div>
+    <button class="sideBtn" onclick="showPanel('beans')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#6c6cb9;color:rgb(103, 144, 191);">Beans</button>
+    <button class="sideBtn" onclick="showPanel('market')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#6c6cb9;color:rgb(119, 139, 173);">Market</button>
+    <button class="sideBtn" onclick="showPanel('stats')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#6c6cb9;color:rgb(139, 178, 237);">Stats</button>
+    <button class="sideBtn" onclick="showPanel('clicker')" style="padding:10px;border-radius:8px;border:none;cursor:pointer;background:#6c6cb9;color:rgb(84, 156, 244);">Clicker</button>
   </div>
 
   <div style="flex:1;display:flex;justify-content:center;align-items:flex-start;padding:30px;">
     <div style="width:800px;">
 
-      <!-- Clicker panel -->
       <div id="panel-clicker" class="panel" style="display:none;text-align:center;">
-        <div style="font-family:'Titan One';font-size:36px;color:gold;">Beanlet</div>
+        <div style="font-family:'Titan One';font-size:36px;color:gold;">Click bean for tokens :) (note that the database takes a little bit to update so if you close the tab before it finishes it won't save)</div>
         <img id="clickImg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThQsydm_zzUbWbSadUVj6oc-x4iHzPa6RlnQ&s"
           style="width:200px;cursor:pointer;margin-top:20px;" onclick="doClick()">
         <div id="clickCount" style="font-size:24px;margin-top:15px;">Clicks: 0</div>
       </div>
 
-      <!-- Beans / Inventory panel -->
       <div id="panel-beans" class="panel" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div style="font-family:'Titan One';font-size:28px;color:gold;">Beans</div>
@@ -145,39 +138,292 @@
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbw_0467HbClqixN9vlNn90dKaQdFJL6ikphJAJ99mJg_IPk1UB2Z9HmDGsRI4Zounww/exec";
+const API = "https://script.google.com/macros/s/AKfycbw0iogFAY42_L8VO-tZuSGB5UacKDJGygL8dGr0BVK0nYX4djyzhURN-uEehLd23V1E/exec";
 
 // DOM refs will be assigned after DOMContentLoaded
 let home, auth, game, user, pass, clickCount, tokenCountEl, inventoryGrid, marketList, statClicks, statTokens;
 let currentUser = null;
 let userData = { tokens: 0, inventory: [], clicks: 0 };
 
-function showAuth(){ if(home) home.style.display = "none"; if(auth) auth.style.display = "flex"; }
+function showAuth(){
+  if(home) home.style.display = "none";
+  if(auth) auth.style.display = "flex";
+}
+
 function userKey(name){ return `beanlet_data_${name}`; }
-function saveUserData(){ if(!currentUser) return; localStorage.setItem(userKey(currentUser), JSON.stringify(userData)); }
-function loadUserData(){ if(!currentUser) return; const raw = localStorage.getItem(userKey(currentUser)); if(raw) userData = JSON.parse(raw); userData.tokens = Number(userData.tokens||0); userData.inventory = userData.inventory || []; userData.clicks = Number(userData.clicks||0); updateUI(); }
 
-async function callApi(payload){ try{ const res = await fetch(API,{ method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(payload) }); if(!res.ok) throw new Error('Network response was not ok: ' + res.status); const text = await res.text(); try{ return JSON.parse(text); }catch(err){ console.error('Invalid JSON from API', text); throw new Error('Invalid JSON response from API'); } }catch(err){ console.error('API call failed', err); throw err; } }
+function saveUserData(){
+  if(!currentUser) return;
+  localStorage.setItem(userKey(currentUser), JSON.stringify(userData));
+}
 
-async function registerUser(){ if(!user || !pass) return alert('Unexpected error'); if(!user.value || !pass.value) return alert("Fill all fields"); try{ const d = await callApi({ action: "register", username: user.value.trim(), password: pass.value }); if(!d || !d.success) return alert(d && d.message ? d.message : 'User already exists'); currentUser = user.value.trim(); userData = { tokens: 0, inventory: [], clicks: 0 }; saveUserData(); alert('Registered successfully'); if(auth) auth.style.display = "none"; if(game) game.style.display = "flex"; showPanel('clicker'); }catch(err){ alert('Registration failed: ' + (err.message || err)); } }
+function loadUserData(){
+  if(!currentUser) return;
+  const raw = localStorage.getItem(userKey(currentUser));
+  if(raw) userData = JSON.parse(raw);
+  // ensure fields
+  userData.tokens = Number(userData.tokens||0);
+  userData.inventory = userData.inventory || [];
+  userData.clicks = Number(userData.clicks||0);
+  updateUI();
+}
 
-async function loginUser(){ if(!user || !pass) return alert('Unexpected error'); if(!user.value || !pass.value) return alert("Fill all fields"); try{ const d = await callApi({ action: "login", username: user.value.trim(), password: pass.value }); if(!d || !d.success) return alert(d && d.message ? d.message : 'Invalid login'); currentUser = user.value.trim(); loadUserData(); if(d.clicks) userData.clicks = Number(d.clicks||0); saveUserData(); if(clickCount) clickCount.innerText = "Clicks: " + (userData.clicks || 0); if(auth) auth.style.display = "none"; if(game) game.style.display = "flex"; renderMarket(); renderInventory(); showPanel('clicker'); }catch(err){ alert('Login failed: ' + (err.message || err)); } }
+async function callApi(payload){
+  try{
+    const res = await fetch(API,{ method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(payload) });
+    if(!res.ok) throw new Error('Network response was not ok: ' + res.status);
+    const text = await res.text();
+    try{ return JSON.parse(text); }catch(err){ console.error('Invalid JSON from API', text); throw new Error('Invalid JSON response from API'); }
+  }catch(err){ console.error('API call failed', err); throw err; }
+}
 
-async function doClick(){ if(!currentUser) return alert('Not logged in'); try{ const d = await callApi({ action: "click", username: currentUser }); if(d && d.success){ userData.clicks = Number(userData.clicks||0) + 1; userData.tokens = Number(userData.tokens||0) + 1; saveUserData(); updateUI(); }else{ console.warn('Click not recorded', d); } }catch(err){ console.warn('Click API failed, awarding locally', err); userData.clicks = Number(userData.clicks||0) + 1; userData.tokens = Number(userData.tokens||0) + 1; saveUserData(); updateUI(); } }
+async function registerUser(){
+  if(!user || !pass) return alert('Unexpected error');
+  if(!user.value || !pass.value) return alert("Fill all fields");
+  try{
+    const d = await callApi({ action: "register", username: user.value.trim(), password: pass.value });
+    if(!d || !d.success) return alert(d && d.message ? d.message : 'User already exists');
+    // create local profile
+    currentUser = user.value.trim();
+    userData = { tokens: 0, inventory: [], clicks: 0 };
+    saveUserData();
+    alert('Registered successfully');
+    if(auth) auth.style.display = "none";
+    if(game) game.style.display = "flex";
+    showPanel('clicker');
+  }catch(err){ alert('Registration failed: ' + (err.message || err)); }
+}
 
-function updateUI(){ if(clickCount) clickCount.innerText = "Clicks: " + (userData.clicks || 0); if(tokenCountEl) tokenCountEl.innerText = userData.tokens || 0; if(statClicks) statClicks.innerText = "Clicks: " + (userData.clicks || 0); if(statTokens) statTokens.innerText = "Tokens: " + (userData.tokens || 0); renderInventory(); }
+async function loginUser(){
+  if(!user || !pass) return alert('Unexpected error');
+  if(!user.value || !pass.value) return alert("Fill all fields");
+  try{
+    const d = await callApi({ action: "login", username: user.value.trim(), password: pass.value });
+    if(!d || !d.success) return alert(d && d.message ? d.message : 'Invalid login');
+    currentUser = user.value.trim();
+    // load local data (or create if missing)
+    loadUserData();
+    // prefer server clicks/tokens if available
+    if(d.clicks) userData.clicks = Number(d.clicks||0);
+    if(d.tokens) userData.tokens = Number(d.tokens||0);
+    saveUserData();
+    if(clickCount) clickCount.innerText = "Clicks: " + (userData.clicks || 0);
+    if(auth) auth.style.display = "none";
+    if(game) game.style.display = "flex";
+    renderMarket();
+    renderInventory();
+    showPanel('clicker');
+  }catch(err){ alert('Login failed: ' + (err.message || err)); }
+}
 
-function showPanel(name){ const panels = ['clicker','beans','market','stats']; panels.forEach(p => { const el = document.getElementById('panel-' + p); if(el) el.style.display = (p === name) ? 'block' : 'none'; }); document.querySelectorAll('#sidebar .sideBtn').forEach(b=>b.style.background='#2a2a2a'); const btn = Array.from(document.querySelectorAll('#sidebar .sideBtn')).find(b=>b.textContent.toLowerCase()===name); if(btn) btn.style.background='#4368a8'; }
+async function doClick(){
+  if(!currentUser) return alert('Not logged in');
+  try{
+    // call server to increment clicks (sheet)
+    const d = await callApi({ action: "click", username: currentUser });
+    if(d && d.success){
+      // use authoritative server values when possible
+      userData.clicks = Number(d.clicks || userData.clicks || 0);
+      userData.tokens = Number(d.tokens || userData.tokens || 0);
+      saveUserData();
+      updateUI();
+    }else{
+      console.warn('Click not recorded', d);
+    }
+  }catch(err){
+    // even if API fails, still grant locally to keep experience fluid
+    console.warn('Click API failed, awarding locally', err);
+    userData.clicks = Number(userData.clicks||0) + 1;
+    userData.tokens = Number(userData.tokens||0) + 1;
+    saveUserData();
+    updateUI();
+  }
+}
 
-const PACKS = [ { id: 'beanpack', title: 'Bean Pack', cost: 5, image: 'https://via.placeholder.com/300x120?text=Bean+Pack', contents: [ { name: 'Default Bean', image: 'https://via.placeholder.com/120?text=Default+Bean', rarity: 'Uncommon', rate: 45 }, { name: 'Scary Bean', image: 'https://via.placeholder.com/120?text=Scary+Bean', rarity: 'Rare', rate: 25 }, { name: 'Orange Bean', image: 'https://via.placeholder.com/120?text=Orange+Bean', rarity: 'Epic', rate: 15 }, { name: 'Epic Bean', image: 'https://via.placeholder.com/120?text=Epic+Bean', rarity: 'Legendary', rate: 8 }, { name: 'Interview Bean', image: 'https://via.placeholder.com/120?text=Interview+Bean', rarity: 'Chroma', rate: 5 }, { name: 'Bean Troll', image: 'https://via.placeholder.com/120?text=Bean+Troll', rarity: 'Mythical', rate: 2 } ] } ];
+function updateUI(){
+  if(clickCount) clickCount.innerText = "Clicks: " + (userData.clicks || 0);
+  if(tokenCountEl) tokenCountEl.innerText = userData.tokens || 0;
+  if(statClicks) statClicks.innerText = "Clicks: " + (userData.clicks || 0);
+  if(statTokens) statTokens.innerText = "Tokens: " + (userData.tokens || 0);
+  renderInventory();
+}
 
-function renderMarket(){ if(!marketList) return; marketList.innerHTML = ''; PACKS.forEach(p=>{ const card = document.createElement('div'); card.style.background = '#222'; card.style.padding = '12px'; card.style.borderRadius = '8px'; card.innerHTML = ` <div style="font-weight:700;color:gold;">${p.title}</div> <img src="${p.image}" style="width:100%;border-radius:6px;margin-top:8px;"> <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;"> <div style="color:#ddd">Cost: ${p.cost} tokens</div> <button style="padding:8px;border-radius:6px;border:none;background:#6a86d1;color:white;cursor:pointer;" onclick="buyPack('${p.id}')">Buy</button> </div> `; marketList.appendChild(card); }); }
+function showPanel(name){
+  const panels = ['clicker','beans','market','stats'];
+  panels.forEach(p => {
+    const el = document.getElementById('panel-' + p);
+    if(el) el.style.display = (p === name) ? 'block' : 'none';
+  });
+  // highlight active button
+  document.querySelectorAll('#sidebar .sideBtn').forEach(b=>b.style.background='#2a2a2a');
+  const btn = Array.from(document.querySelectorAll('#sidebar .sideBtn')).find(b=>b.textContent.toLowerCase()===name);
+  if(btn) btn.style.background='#4368a8';
+}
 
-function renderInventory(){ if(!inventoryGrid) return; inventoryGrid.innerHTML = ''; userData.inventory = userData.inventory || []; if(userData.inventory.length===0){ inventoryGrid.innerHTML = '<div style="color:#aaa;grid-column:1/-1;text-align:center;padding:20px;">No beans yet. Buy packs in the market.</div>'; return; } userData.inventory.forEach(item=>{ const c = document.createElement('div'); c.style.background = '#222'; c.style.padding = '8px'; c.style.borderRadius = '8px'; c.style.textAlign = 'center'; c.innerHTML = `<img src="${item.image}" style="width:100%;border-radius:6px;"><div style="color:#fff;margin-top:8px">${item.name}</div>`; inventoryGrid.appendChild(c); }); }
+// Market data: Bean Pack with rarities and weighted rates (rates sum to 100)
+const PACKS = [
+  {
+    id: 'beanpack',
+    title: 'Bean Pack',
+    cost: 5,
+    image: 'https://via.placeholder.com/300x120?text=Bean+Pack',
+    contents: [
+      { name: 'Default Bean', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk6JNgWI6IiOXhBEORgYgqHH2zeeIwEHVR-w&s', rarity: 'Common', rate: 55 },
+      { name: 'Scary Bean', image: 'https://i.ibb.co/nNMWtNbP/Screenshot-2026-01-10-at-11-23-45-AM.png', rarity: 'Common', rate: 30 },
+      { name: 'Orange Bean', image: 'data:image/png;base64,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', rarity: 'Rare', rate: 10 },
+      { name: 'Bean Troll', image: 'https://b.blacket.wiki/content/emojis/beanTroll.webp', rarity: 'Epic', rate: 3.99 },
+      { name: 'Interview Bean', image: 'https://i.ibb.co/C5qBHtTj/Screenshot-2026-01-10-at-11-24-27-AM.png', rarity: 'Legendary', rate: 1 },
+      { name: 'Epic Bean', image: 'https://b.blacket.wiki/content/emojis/ben.webp', rarity: 'Mythical', rate: 0.01 }
+    ]
+  }
+];
 
-function pickFromPack(contents){ const total = contents.reduce((s,it)=>s + (it.rate||0), 0); let r = Math.random() * total; for(const it of contents){ const w = it.rate || 0; if(r < w) return it; r -= w; } return contents[contents.length-1]; }
+function renderMarket(){
+  if(!marketList) return;
+  marketList.innerHTML = '';
+  PACKS.forEach(p=>{
+    const card = document.createElement('div');
+    card.style.background = '#222';
+    card.style.padding = '12px';
+    card.style.borderRadius = '8px';
+    card.innerHTML = `
+      <div style="font-weight:700;color:gold;">${p.title}</div>
+      <img src="${p.image}" style="width:100%;border-radius:6px;margin-top:8px;">
+      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="color:#ddd">Cost: ${p.cost} tokens</div>
+        <button style="padding:8px;border-radius:6px;border:none;background:#6a86d1;color:white;cursor:pointer;" onclick="buyPack('${p.id}')">Buy</button>
+      </div>
+    `;
+    marketList.appendChild(card);
+  });
+}
 
-function buyPack(packId){ if(!currentUser) return alert('Log in first'); const p = PACKS.find(x=>x.id===packId); if(!p) return alert('Pack not found'); if(userData.tokens < p.cost) return alert('Not enough tokens'); userData.tokens -= p.cost; const choice = pickFromPack(p.contents); const newItem = { id: 'b'+Date.now()+Math.random().toString(36).slice(2,6), name: choice.name, image: choice.image, rarity: choice.rarity }; userData.inventory.push(newItem); saveUserData(); updateUI(); alert('You got: ' + choice.name + ' (' + (choice.rarity||'') + ')'); }
+// Helper: count inventory items and keep a representative item object
+function getInventoryCounts(){
+  const counts = {};
+  (userData.inventory || []).forEach(it => {
+    const key = it.name || it.id;
+    if(!counts[key]) counts[key] = { item: it, count: 0 };
+    counts[key].count++;
+  });
+  return counts;
+}
+
+function renderInventory(){
+  if(!inventoryGrid) return;
+  inventoryGrid.innerHTML = '';
+  const counts = getInventoryCounts();
+  const keys = Object.keys(counts);
+  if(keys.length === 0){
+    inventoryGrid.innerHTML = '<div style="color:#aaa;grid-column:1/-1;text-align:center;padding:20px;">No beans yet. Buy packs in the market.</div>';
+    return;
+  }
+
+  // Group by packs defined in PACKS
+  const groups = [];
+  const remaining = new Set(keys);
+
+  PACKS.forEach(pack => {
+    const groupItems = [];
+    pack.contents.forEach(content => {
+      const k = content.name;
+      if(counts[k]){
+        groupItems.push({ item: counts[k].item, count: counts[k].count });
+        remaining.delete(k);
+      }
+    });
+    if(groupItems.length) groups.push({ title: pack.title, items: groupItems });
+  });
+
+  // Any remaining items that don't match known packs
+  if(remaining.size > 0){
+    const others = [];
+    remaining.forEach(k => others.push({ item: counts[k].item, count: counts[k].count }));
+    groups.push({ title: 'Other', items: others });
+  }
+
+  // Render groups
+  groups.forEach(g => {
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.justifyContent = 'space-between';
+    header.style.margin = '10px 0 6px 0';
+    header.innerHTML = `<div style="font-family:'Titan One';font-size:18px;color:gold;">${g.title}</div><div style="color:#aaa;font-size:12px;">${g.items.length} types</div>`;
+    inventoryGrid.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(4,1fr)';
+    grid.style.gap = '12px';
+    g.items.forEach(it => {
+      const item = it.item;
+      const c = document.createElement('div');
+      c.style.background = '#222';
+      c.style.padding = '8px';
+      c.style.borderRadius = '8px';
+      c.style.textAlign = 'center';
+      c.style.position = 'relative';
+      const img = document.createElement('img');
+      img.src = item.image;
+      img.style.width = '100%';
+      img.style.borderRadius = '6px';
+      const name = document.createElement('div');
+      name.style.color = '#fff';
+      name.style.marginTop = '8px';
+      name.textContent = item.name;
+      c.appendChild(img);
+      c.appendChild(name);
+      if(it.count > 1){
+        const badge = document.createElement('div');
+        badge.style.position = 'absolute';
+        badge.style.left = '8px';
+        badge.style.top = '8px';
+        badge.style.background = '#2ecc71';
+        badge.style.color = 'white';
+        badge.style.borderRadius = '10px';
+        badge.style.padding = '2px 6px';
+        badge.style.fontSize = '12px';
+        badge.textContent = it.count;
+        c.appendChild(badge);
+      }
+      grid.appendChild(c);
+    });
+    inventoryGrid.appendChild(grid);
+  });
+}
+
+function pickFromPack(contents){
+  const total = contents.reduce((s,it)=>s + (it.rate||0), 0);
+  let r = Math.random() * total;
+  for(const it of contents){
+    const w = it.rate || 0;
+    if(r < w) return it;
+    r -= w;
+  }
+  return contents[contents.length-1];
+}
+
+async function buyPack(packId){
+  if(!currentUser) return alert('Log in first');
+  const p = PACKS.find(x=>x.id===packId);
+  if(!p) return alert('Pack not found');
+  if(userData.tokens < p.cost) return alert('Not enough tokens');
+  userData.tokens -= p.cost;
+  // weighted random choice based on rate
+  const choice = pickFromPack(p.contents);
+  const newItem = { id: 'b'+Date.now()+Math.random().toString(36).slice(2,6), name: choice.name, image: choice.image, rarity: choice.rarity };
+  userData.inventory.push(newItem);
+  saveUserData();
+  updateUI();
+  // try to sync tokens to server (best-effort)
+  try{
+    await callApi({ action: 'set_tokens', username: currentUser, tokens: userData.tokens });
+  }catch(err){
+    console.warn('Failed to sync tokens to server', err);
+  }
+  alert('You got: ' + choice.name + ' (' + (choice.rarity||'') + ')');
+}
 
 window.addEventListener('DOMContentLoaded', ()=>{
   home = document.getElementById('home');
@@ -192,7 +438,9 @@ window.addEventListener('DOMContentLoaded', ()=>{
   statClicks = document.getElementById('statClicks');
   statTokens = document.getElementById('statTokens');
 
-  if(user && pass){ [user, pass].forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') e.preventDefault(); })); }
+  if(user && pass){
+    [user, pass].forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') e.preventDefault(); }));
+  }
 
   renderMarket();
   showPanel('clicker');
